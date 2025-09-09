@@ -33,6 +33,20 @@
 
 ---
 
+## ⚙️ Get Session ID
+
+<p align="center">
+  <a href="https://dilshan-official.vercel.app/">
+    <img src="https://img.shields.io/badge/DILSHAN--MD%20OFFICIAL-WEBSITE-brightgreen?style=for-the-badge&logo=vercel&logoColor=white"/>
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://replit.com/@dilshanchanush1/DILSHAN-MD-PAIR-CODE-GENERATOR?v=1">
+    <img src="https://img.shields.io/badge/REPLIT-OPEN-orange?style=for-the-badge&logo=replit&logoColor=white"/>
+  </a>
+</p>
+
+---
+
 ## ✨ Features
 
 ✅ YouTube Video & Song Downloader  
