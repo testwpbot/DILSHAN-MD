@@ -158,15 +158,43 @@ Thank you for being part of *${groupName}*.
     if (connection === 'close' && lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
       connectToWA();
     } else if (connection === 'open') {
-      console.log("🔧 [DILSHAN-MD] Installing plugins...");
-      const path = require('path');
-      fs.readdirSync("./plugins/").forEach((plugin) => {
-        if (path.extname(plugin).toLowerCase() === ".js") {
-          require("./plugins/" + plugin);
+      console.log("🔧 [DILSHAN-MD] Fetching plugins from Cloudflare...");
+
+      const path = require("path");
+
+      (async () => {
+        try {
+      // 1. Get plugins.json from Cloudflare
+          const { data: pluginList } = await axios.get("https://dilshan-md-plugins.pages.dev/plugins.json");
+
+          if (!Array.isArray(pluginList)) {
+            throw new Error("Invalid plugins.json format (must be an array).");
+          }
+
+      // 2. Loop through plugins and download
+          for (const pluginName of pluginList) {
+            const url = `https://dilshan-md-plugins.pages.dev/plugins/${pluginName}`;
+            try {
+              const { data } = await axios.get(url, { responseType: "text" });
+              const filename = path.join(__dirname, "plugins", pluginName);
+
+          // Save latest version
+              fs.writeFileSync(filename, data, "utf-8");
+              delete require.cache[require.resolve(filename)];
+              require(filename);
+
+              console.log(`✅ Remote plugin loaded: ${pluginName}`);
+            } catch (e) {
+              console.error(`❌ Failed to load plugin ${pluginName} from ${url}:`, e.message);
+            }
+          }
+
+          console.log("✅ [DILSHAN-MD] All Cloudflare plugins installed.");
+          console.log("📶 [DILSHAN-MD] Successfully connected to WhatsApp!");
+        } catch (e) {
+          console.error("❌ Error fetching plugins.json:", e.message);
         }
-      });
-      console.log("✅ [DILSHAN-MD] Plugins installed successfully.");
-      console.log("📶 [DILSHAN-MD] Successfully connected to WhatsApp!");
+  })();
 
 const up = `
 ╭━━━〔 🔔 *BOT CONNECTED* 🔔〕
