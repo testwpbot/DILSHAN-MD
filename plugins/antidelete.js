@@ -34,7 +34,7 @@ module.exports = {
         await fs.promises.writeFile(filePath, msg._mediaBuffer);
         deletedMediaPath[key.id] = filePath;
       } catch (e) {
-        console.log('âŒ Media save failed:', e.message);
+        console.log('❌ Media save failed:', e.message);
       }
     }
   },
@@ -59,16 +59,16 @@ module.exports = {
 
 
       try {
-        let caption = `â”â”â” ðŸš¨ *DILSHAN-MD Alert* â”â”â”“
+        let caption = `┏━━ 🚨 *DILSHAN-MD Alert* ━━┓
 
-ðŸ‘¤ *Sender:* @${sender.split('@')[0]}
-ðŸ•’ *Time:* ${new Date().toLocaleString()}
+👤 *Sender:* @${sender.split('@')[0]}
+🕒 *Time:* ${new Date().toLocaleString()}
 
-âš ï¸ Deleted message has been successfully *recovered*.
+⚠️ Deleted message has been successfully *recovered*.
 
-âœ… Service: *DILSHAN-MD WhatsApp Assistant*
+✅ Service: *DILSHAN-MD WhatsApp Assistant*
 
-â”—â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”›`;
+┗━━━━━━━━━━━━━━━━━━━━┛`;
 
         const mediaPath = deletedMediaPath[update.key.id] || deletedMediaPath[update.update?.key?.id];
         if (mediaPath && fs.existsSync(mediaPath)) {
@@ -79,12 +79,12 @@ module.exports = {
             await conn.sendMessage(from, { video: { url: mediaPath }, ...messageOptions });
           } else if (mediaPath.endsWith('.webp')) {
             await conn.sendMessage(from, { sticker: { url: mediaPath } });
-            await conn.sendMessage(from, { text: caption, mentions: [sender] }); // ðŸ‘ˆ Sticker caption
+            await conn.sendMessage(from, { text: caption, mentions: [sender] }); // 👈 Sticker caption
           } else if (mediaPath.endsWith('.ogg')) {
             await conn.sendMessage(from, {
               audio: { url: mediaPath, mimetype: 'audio/ogg; codecs=opus' }
             });
-            await conn.sendMessage(from, { text: caption, mentions: [sender] }); // ðŸ‘ˆ Audio caption
+            await conn.sendMessage(from, { text: caption, mentions: [sender] }); // 👈 Audio caption
           } else if (mediaPath.endsWith('.pdf')) {
             await conn.sendMessage(from, { document: { url: mediaPath }, ...messageOptions });
           } else {
@@ -114,13 +114,13 @@ module.exports = {
           }
 
           if (textMessage) {
-            await conn.sendMessage(from, { text: caption + `\n\nðŸ“ *Message:* ${textMessage}`, mentions: [sender] });
+            await conn.sendMessage(from, { text: caption + `\n\n📝 *Message:* ${textMessage}`, mentions: [sender] });
           } else {
             await conn.sendMessage(from, { text: caption, mentions: [sender] });
           }
         }
       } catch (e) {
-        console.log('âŒ Error resending deleted message:', e);
+        console.log('❌ Error resending deleted message:', e);
       }
     }
   }
