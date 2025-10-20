@@ -84,11 +84,6 @@ if (!fs.existsSync(path.join(authDir, 'creds.json'))) {
 }
 
 const { replyHandlers = [], commands = [] } = require('./command') || {};
-const antiDeletePlugin = require('./plugins/antidelete.js');
-global.pluginHooks = global.pluginHooks || [];
-if (antiDeletePlugin) global.pluginHooks.push(antiDeletePlugin);
-const viewOncePlugin = require('./plugins/viewonce.js');
-if (viewOncePlugin) global.pluginHooks.push(viewOncePlugin);
 
 async function connectToWA() {
   console.log("🛰️ [DILSHAN-MD] Initializing WhatsApp connection...");
