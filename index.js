@@ -55,9 +55,6 @@ if (!fs.existsSync(path.join(authDir, 'creds.json'))) {
     let realFileId = sessdata;
     if (sessdata.includes('|')) {
       realFileId = sessdata.split('|')[1];
-      console.log(`🔧 Extracted real file ID from custom format`);
-      console.log(`📁 Original: ${sessdata}`);
-      console.log(`🔑 Real File ID: ${realFileId}`);
     } else {
       console.log(`🔧 Using file ID directly: ${realFileId}`);
     }
@@ -192,7 +189,7 @@ Thank you for being part of *${groupName}*.
     } else if (connection === 'open') {
       (async () => {
         try {
-          console.log("🔧 [DILSHAN-MD] Installing plugins...");
+          //console.log("🔧 [DILSHAN-MD] Installing plugins...");
           // Load local plugins
           const pluginsDir = path.join(__dirname, 'plugins');
           if (fs.existsSync(pluginsDir)) {
