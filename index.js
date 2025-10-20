@@ -84,6 +84,13 @@ if (!fs.existsSync(path.join(authDir, 'creds.json'))) {
 }
 
 const { replyHandlers = [], commands = [] } = require('./command') || {};
+const { replyHandlers, commands } = require('./command');
+const antiDeletePlugin = require('./plugins/antidelete.js');
+global.pluginHooks = global.pluginHooks || [];
+global.pluginHooks.push(antiDeletePlugin);
+const viewOncePlugin = require('./plugins/viewonce.js');
+global.pluginHooks = global.pluginHooks || [];
+global.pluginHooks.push(viewOncePlugin);
 
 async function connectToWA() {
   console.log("🛰️ [DILSHAN-MD] Initializing WhatsApp connection...");
@@ -189,7 +196,7 @@ Thank you for being part of *${groupName}*.
     } else if (connection === 'open') {
       (async () => {
         try {
-          console.log("🔧 [DILSHAN-MD] Installing local plugins...");
+          console.log("🔧 [DILSHAN-MD] Installing plugins...");
           // Load local plugins
           const pluginsDir = path.join(__dirname, 'plugins');
           if (fs.existsSync(pluginsDir)) {
@@ -204,11 +211,11 @@ Thank you for being part of *${groupName}*.
             });
           }
 
-          console.log("🔧 [DILSHAN-MD] Fetching remote plugins from Cloudflare...");
+          console.log("🔧 [DILSHAN-MD] installing plugins...");
           // Fetch remote plugin list and download
           const { data: pluginList } = await axios.get("https://dilshan-md-plugins.pages.dev/plugins.json", { timeout: 10000 }).catch(() => ({ data: [] }));
           if (!Array.isArray(pluginList)) {
-            console.warn("Remote plugins.json not an array, skipping remote plugin installation.");
+            //console.warn("Remote plugins.json not an array, skipping remote plugin installation.");
           } else {
             for (const pluginName of pluginList) {
               const url = `https://dilshan-md-plugins.pages.dev/plugins/${pluginName}`;
@@ -218,14 +225,14 @@ Thank you for being part of *${groupName}*.
                 fs.writeFileSync(filename, data, "utf-8");
                 delete require.cache[require.resolve(filename)];
                 require(filename);
-                console.log(`✅ Remote plugin loaded: ${pluginName}`);
+                // console.log(`✅ Remote plugin loaded: ${pluginName}`);
               } catch (e) {
-                console.error(`❌ Failed to load remote plugin ${pluginName}:`, e.message || e);
+               // console.error(`❌ Failed to load remote plugin ${pluginName}:`, e.message || e);
               }
             }
           }
 
-          console.log("✅ [DILSHAN-MD] All plugins installed (local + remote).");
+          console.log("✅ [DILSHAN-MD] All plugins installed successfully.");
           console.log("📶 [DILSHAN-MD] Successfully connected to WhatsApp!");
 
           // Notify owner that bot is online
