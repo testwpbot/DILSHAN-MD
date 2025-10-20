@@ -84,7 +84,6 @@ if (!fs.existsSync(path.join(authDir, 'creds.json'))) {
 }
 
 const { replyHandlers = [], commands = [] } = require('./command') || {};
-const { replyHandlers, commands } = require('./command');
 const antiDeletePlugin = require('./plugins/antidelete.js');
 global.pluginHooks = global.pluginHooks || [];
 global.pluginHooks.push(antiDeletePlugin);
