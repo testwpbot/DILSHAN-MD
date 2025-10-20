@@ -87,9 +87,6 @@ const { replyHandlers = [], commands = [] } = require('./command') || {};
 const antiDeletePlugin = require('./plugins/antidelete.js');
 global.pluginHooks = global.pluginHooks || [];
 global.pluginHooks.push(antiDeletePlugin);
-const viewOncePlugin = require('./plugins/viewonce.js');
-global.pluginHooks = global.pluginHooks || [];
-global.pluginHooks.push(viewOncePlugin);
 
 async function connectToWA() {
   console.log("🛰️ [DILSHAN-MD] Initializing WhatsApp connection...");
