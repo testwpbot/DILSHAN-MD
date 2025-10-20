@@ -140,7 +140,8 @@ async function connectToWA() {
             }
           }
 
-          const number = userId.split('@')[0];
+          const jid = typeof userId === 'string' ? userId : userId?.id || '';
+          const number = jid.split('@')[0];
           const message = `
 🌟 Hey @${number}, welcome to *${groupName}*! 🥳
 
@@ -161,7 +162,8 @@ We’re super happy to have you join us.
 
       if (action === 'remove') {
         for (const userId of participants) {
-          const number = userId.split('@')[0];
+          const jid = typeof userId === 'string' ? userId : userId?.id || '';
+          const number = jid.split('@')[0];
           const message = `
 👋 Hey @${number}, we’ll miss you! 💔
 
