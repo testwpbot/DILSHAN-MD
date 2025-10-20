@@ -116,33 +116,47 @@ async function connectToWA() {
   });
 
   // Group participants update (single combined handler)
-  conn.ev.on('group-participants.update', async (update) => {
-    try {
-      // Some debug info
-      console.log("📥 New Group Update:", update.id || update.subject || update);
+conn.ev.on('group-participants.update', async (update) => {
+  try {
+    // Normalize group ID safely
+    const groupId = typeof update.id === 'string' ? update.id : update.id?.id || '';
+    if (!groupId) return;
 
-      const { id: groupId, participants = [], action } = update;
-      const metadata = await conn.groupMetadata(groupId).catch(() => ({}));
-      const groupName = metadata?.subject || 'this group';
+    console.log("📥 New Group Update:", groupId, update.action);
 
-      if (action === 'add') {
-        for (const userId of participants) {
-          // Anti-fake group enforcement (only Sri Lanka numbers)
-          if (global.antiFakeGroups?.[groupId]) {
-            const number = userId.split('@')[0];
-            if (!number.startsWith("94")) {
-              await conn.sendMessage(groupId, {
-                text: `📵 @${number} removed — only Sri Lankan numbers allowed.`,
-                mentions: [userId]
-              });
-              await conn.groupParticipantsUpdate(groupId, [userId], "remove");
-              continue;
-            }
+    const { participants = [], action } = update;
+    if (!Array.isArray(participants) || !action) return;
+
+    // Fetch group metadata safely
+    const metadata = await conn.groupMetadata(groupId).catch(() => ({}));
+    const groupName = metadata?.subject || 'this group';
+
+    // Loop through participants
+    for (const p of participants) {
+      // Normalize participant JID
+      const jid = typeof p === 'string' ? p : p?.id || '';
+      if (!jid || typeof jid !== 'string') continue;
+      const number = jid.split('@')[0];
+
+      // 🛡️ Anti-fake enforcement
+      if (action === 'add' && global.antiFakeGroups?.[groupId]) {
+        if (!number.startsWith("94")) {
+          try {
+            await conn.sendMessage(groupId, {
+              text: `📵 @${number} removed — only Sri Lankan numbers allowed.`,
+              mentions: [jid]
+            });
+            await conn.groupParticipantsUpdate(groupId, [jid], "remove");
+          } catch (err) {
+            console.error("Anti-fake removal error:", err);
           }
+          continue; // Skip welcome for non-SL number
+        }
+      }
 
-          const jid = typeof userId === 'string' ? userId : userId?.id || '';
-          const number = jid.split('@')[0];
-          const message = `
+      // 🌟 Welcome message
+      if (action === 'add') {
+        const message = `
 🌟 Hey @${number}, welcome to *${groupName}*! 🥳
 
 We’re super happy to have you join us.  
@@ -152,35 +166,33 @@ We’re super happy to have you join us.
 
 ✨ Together, let’s create a fun, supportive, and respectful community. 💖
 `;
-          await conn.sendMessage(groupId, {
-            image: { url: 'https://github.com/dilshan62/DILSHAN-MD/blob/main/images/WELCOME_DILSHAN_MD.jpg?raw=true' },
-            caption: message,
-            mentions: [userId]
-          });
-        }
+        await conn.sendMessage(groupId, {
+          image: { url: 'https://github.com/dilshan62/DILSHAN-MD/blob/main/images/WELCOME_DILSHAN_MD.jpg?raw=true' },
+          caption: message,
+          mentions: [jid]
+        });
       }
 
+      // 👋 Goodbye message
       if (action === 'remove') {
-        for (const userId of participants) {
-          const jid = typeof userId === 'string' ? userId : userId?.id || '';
-          const number = jid.split('@')[0];
-          const message = `
+        const message = `
 👋 Hey @${number}, we’ll miss you! 💔
 
 Thank you for being part of *${groupName}*.  
 ✨ Wishing you happiness and all the best in everything you do! 💖
 `;
-          await conn.sendMessage(groupId, {
-            image: { url: 'https://github.com/dilshan62/DILSHAN-MD/blob/main/images/GOOD_BYE_DILSHAN_MD.jpg?raw=true' },
-            caption: message,
-            mentions: [userId]
-          });
-        }
+        await conn.sendMessage(groupId, {
+          image: { url: 'https://github.com/dilshan62/DILSHAN-MD/blob/main/images/GOOD_BYE_DILSHAN_MD.jpg?raw=true' },
+          caption: message,
+          mentions: [jid]
+        });
       }
-    } catch (e) {
-      console.error('Group participants update error:', e);
     }
-  });
+  } catch (e) {
+    console.error('Group participants update error:', e);
+  }
+});
+
 
   // connection.update handler
   conn.ev.on('connection.update', (update) => {
